@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="row">
+	<div class="col-md-4">
+		<h1>{{clinic.clinic_name}}</h1>
+	</div>
+
+	<div class="col-md-4">
+		<a href="http://zakupki.gov.ru/epz/order/quicksearch/search_eis.html?searchString={{clinic.inn}}" target="_blank">
+			<button class="btn btn-primary" id="new-person">
+				<span class="">Тендеры</span>
+			</button>
+		</a>
+	</div>
+
+	<div class="col-md-4">
+		<a href="https://clearspending.ru/contract/?productsearch=&search-submit=&grbs=&regnum=&daterange=01.01.2017-31.12.2017&price_gte=&price_lte=&customerregion=&address=&budgetlevel=&okdp_okpd=&sort=-signDate&fz=None&customerinn={{clinic.inn}}&customerkpp=&supplierinn=&supplierkpp=&filter=True" target="_blank">
+			<button class="btn btn-primary" id="new-person">
+				<span class="">Контракты</span>
+			</button>
+		</a>
+	</div>
+
+</div>
+<div class="row">
+	<div class="col-md-4">
+		<h1>Клиенты</h1>
+	</div>
+	<div class="col-md-4">
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
+  		Добавить клиента
+		</button>
+	</div>
+</div>
+<!-- Modal -->
+	<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="ModalLongTitle">Новый клиент</h5>
+				</div>
+				<div class="modal-body">
+					{% if form %}
+						{{ wtf.quick_form(form, id='new_client') }}
+					{% endif %}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+		{% for person in persons %}
+		<table class="table table-hover">
+			<tr>
+				<td>
+						<img class="img-client" src="/uploads/{{person.picture_filename}}" alt="Тут должно быть фото клиента">
+				</td>
+				<td>
+						<a href = "{{url_for('editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">
+						<h5>{{person.name}}</h5>
+						<dl class="row">
+							<dt class="col-sm-4">Телефон: </dt>
+							<dd class="col-sm-8">{{person.phone}}</dd>
+							<dt class="col-sm-4">Почта: </dt>
+							<dd class="col-sm-8">	{{person.email}}</dd>
+							<dt class="col-sm-4">Дата предыдущего визита: </dt>
+							<dd class="col-sm-8">	{{person.last_visit}}</dd>
+							<dt class="col-sm-4">Дата запланированного визита: </dt>
+							<dd class="col-sm-8">	{{person.next_visit}}</dd>
+							<dt class="col-sm-4">Готовит заявку: </dt>
+							<dd class="col-sm-8">	{{person.date_of_request}}</dd>
+							<dt class="col-sm-4">Отделение: </dt>
+							<dd class="col-sm-8">	{{person.department}}</dd>
+							<dt class="col-sm-4">Комментарии: </dt>
+							<dd class="col-sm-8">	{{person.comments}}</dd>
+						</dl>
+						</a>
+					</td>
+		  </tr>
+		 </table>
+			{% endfor %}
+
+			<a href="{{ url_for('showClinics', region_name=region_name) }}">
+			<p>Назад</p>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+{% endblock %}

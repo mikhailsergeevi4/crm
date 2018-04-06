@@ -1,0 +1,41 @@
+/* Style for small screen */
+
+@media screen and (max-width:565px) {
+  .header-title {
+    display: none;
+  }
+  .header-menu svg {
+    margin-top: 10px;
+    width: 54px;
+    fill: #d85353;
+    cursor: pointer;
+  }
+  .nav {
+    z-index: 10;
+    background-color: #fff;
+    width: 105%;
+    position: absolute;
+    /* This trasform moves the drawer off canvas. */
+    -webkit-transform: translate(-105%, 0);
+    transform: translate(-105%, 0);
+    /* Optionally, we animate the drawer. */
+    transition: transform 0.3s ease;
+    margin-top: 1px;
+  }
+  .nav.open {
+    -webkit-transform: translate(-5%, 0);
+    transform: translate(-5%, 0);
+  }
+  .nav-item {
+    width: 100%;
+  }
+  .header-menu {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    padding: 1em;
+  }
+  .header-logo {
+    width: 80%;
+  }
+}

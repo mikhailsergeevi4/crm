@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+  <div class="row">
+    <div class="col-md-8">
+      <h1>Клиники</h1>
+    </div>
+  </div>
+
+	<h1>{{ region.name }}</h1>
+
+    {% if form %}
+    {{ wtf.quick_form(form) }}
+    <br>
+    {% endif %}
+
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Наименование</th>
+					<th>Адрес</th>
+					<th>ИНН</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="myTable">
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+					{% for i in clinics %}
+				<tr>
+					<td><a href='{{url_for('showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
+					<td>{{i.address}}</td>
+					<td>{{i.inn}}</td>
+					<td><a href='{{url_for('editClinic', region_name=region.name, clinic_id = i.id) }}'>Редактировать</a></td>
+					<td></td>
+
+				</tr>
+					{% endfor %}
+			</tbody>
+		</table>
+
+			<a href="{{url_for('showRegions') }}">
+			<p>
+				Назад
+			</p>
+{% endblock %}

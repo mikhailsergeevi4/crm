@@ -1,0 +1,183 @@
+
+/* Custom header */
+#map {
+  height: 300px;
+}
+.header {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+  margin: auto;
+  max-width: 960px;
+}
+
+.header-inner {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.header-logo {
+  height: 72px;
+  margin-right: 1em;
+  vertical-align: top;
+  margin-top: 10px;
+}
+
+.header-title {
+  margin-right: 10px;
+  margin-left: auto;
+  text-align: right;
+  color: #4f647c;
+}
+
+/* Style for header text */
+
+.name {
+  font-family: "Architects Daughter", cursive;
+  font-size: 2em;
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+.ninja {
+  font-family: "Poiret One", cursive;
+  margin-top: 0px;
+}
+/* Max-width for container */
+
+.container {
+  max-width: 960px;
+}
+
+/* Pop-up navigation */
+
+.nav {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-list {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  box-sizing: border-box;
+  display: inline-block;
+  width: 24%;
+  text-align: center;
+  line-height: 24px;
+  padding: 24px;
+  text-transform: uppercase;
+  font-family: "Architects Daughter", cursive;
+}
+.nav a {
+  text-decoration: none;
+  color: #616161;
+  padding: 1.5em;
+}
+
+.nav a:hover {
+  color: #212121;
+  border-bottom: 5px solid #d85353;
+  transition: 0.2s ease;
+}
+
+/* Featured Work */
+
+.border-work {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Portfolio projects */
+
+.work-row {
+  margin-top: 10px;
+}
+
+.img-pict {
+  width: 100%;
+  max-width: 960px;
+  padding-top: 10px;
+
+}
+
+.figcaption-block:hover {
+  border-bottom: 5px solid #d85353;
+  transition: 0.2s ease;
+}
+
+.figcaption-text {
+  color: white;
+  text-align: center;
+  font-family: "Poiret One", cursive;
+}
+
+.simple-link {
+  text-align: center;
+  font-family: "Poiret One", cursive;
+  color: #4f647c;
+}
+
+/* Custom Footer */
+
+.footer-nar {
+  padding-top: 10px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+  width: 100%;
+  text-align: right;
+}
+
+/* Captions */
+
+.effeckt-caption {
+  float: left;
+  overflow: hidden;
+  width: 100%;
+  margin: 0 4% 1rem 0; }
+.effeckt-caption:nth-child(2n) {
+  margin-right: 0;
+ }
+.effeckt-caption img {
+  width: 100%;
+  display: block;
+ }
+.effeckt-caption figcaption {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1rem;
+ }
+.effeckt-caption figcaption h3 {
+  font-size: 1.2rem;
+ }
+.effeckt-caption figcaption p {
+  margin: 0;
+ }
+.effeckt-caption {
+  position: relative;
+ }
+.effeckt-caption img {
+  transition: 500ms;
+ }
+.effeckt-caption figcaption {
+  position: absolute;
+  transition: 500ms;
+  width: 100%;
+ }
+.effeckt-caption[data-effeckt-type="quarter-appear"] figcaption {
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+ }
+.effeckt-caption[data-effeckt-type="quarter-appear"]:hover figcaption,
+.effeckt-caption[data-effeckt-type="quarter-appear"]:active figcaption,
+.effeckt-caption[data-effeckt-type="quarter-appear"].active figcaption {
+     opacity: 1;
+ }
+
+ .effeckt-figcaption-wrap a:hover {
+  text-decoration: none;
+ }
