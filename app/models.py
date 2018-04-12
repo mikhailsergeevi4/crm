@@ -1,4 +1,5 @@
-from app import db, app, login
+from app import db, login
+from flask import current_app
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -60,12 +61,12 @@ class User(UserMixin, db.Model):
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
         except:
             return
@@ -110,9 +111,9 @@ class Person(db.Model):
     phone = db.Column(db.String(20), index=True, unique=True)
     email = db.Column(db.String(180), index=True, unique=True)
     department = db.Column(db.String(100), index=True)
-    last_visit = db.Column(db.String(20))
-    next_visit = db.Column(db.String(20))
-    date_of_request = db.Column(db.String(250))
+    last_visit = db.Column(db.DateTime)
+    next_visit = db.Column(db.DateTime)
+    date_of_request = db.Column(db.DateTime)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visits = db.relationship('Visit', lazy='dynamic')

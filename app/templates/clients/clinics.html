@@ -52,10 +52,10 @@
 				</tr>
 					{% for i in clinics %}
 				<tr>
-					<td><a href='{{url_for('showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
+					<td><a href='{{url_for('main.showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
 					<td>{{i.address}}</td>
 					<td>{{i.inn}}</td>
-					<td><a href='{{url_for('editClinic', region_name=region.name, clinic_id = i.id) }}'>Редактировать</a></td>
+					<td><a href='{{url_for('main.editClinic', region_name=region.name, clinic_id = i.id) }}'>Редактировать</a></td>
 					<td></td>
 
 				</tr>
@@ -63,7 +63,7 @@
 			</tbody>
 		</table>
 
-			<a href="{{url_for('showRegions') }}">
+			<a href="{{url_for('main.showRegions') }}">
 			<p>
 				Назад
 			</p>
