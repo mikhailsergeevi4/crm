@@ -41,7 +41,7 @@
 				<div class="modal-header">
 					<h5 class="modal-title" id="ModalLongTitle">Новый клиент</h5>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" id="modal-body">
 					{% if form %}
 						{{ wtf.quick_form(form, id='new_client') }}
 					{% endif %}
@@ -63,8 +63,42 @@
 						<img class="img-client" src="/uploads/{{person.picture_filename}}" alt="Тут должно быть фото клиента">
 				</td>
 				<td>
-						<a href = "{{url_for('editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">
-						<h5>{{person.name}}</h5>
+
+						<div class='row'>
+							<h5 class='col-md-6'>
+								<a href = "{{url_for('showVisits', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">{{person.name}}</a>
+								</h5>
+							<div class='col-md-4'>
+								<a href = "{{url_for('editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">Редактировать</a>
+							</div>
+							<div class = 'col-md-2'>
+			          <button class="btn btn-default" data-href="{{ url_for('deletePerson', person_id = person.id,   clinic_id=clinic.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
+			            Удалить
+			          </button>
+
+			          <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			                  <div class="modal-dialog">
+			                      <div class="modal-content">
+
+			                          <div class="modal-header">
+			                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			                              <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+			                          </div>
+
+			                          <div class="modal-body">
+			                              <p>Вы уверены что хотите удалить клиента?</p>
+			                          </div>
+
+			                          <div class="modal-footer">
+			                              <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+			                              <a class="btn btn-danger btn-ok">Удалить</a>
+			                          </div>
+			                      </div>
+			                  </div>
+			              </div>
+
+			        </div>
+						</div>
 						<dl class="row">
 							<dt class="col-sm-4">Телефон: </dt>
 							<dd class="col-sm-8">{{person.phone}}</dd>
@@ -91,10 +125,5 @@
 			<p>Назад</p>
 
 
-
-{% endblock %}
-
-{% block scripts %}
-    {{ super() }}
 
 {% endblock %}

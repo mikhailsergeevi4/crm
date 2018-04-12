@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, request, url_for, send_from_directory, jsonify
 from app import app, db, images
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, NewRegion, NewClinic, EditClinic, NewPerson
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, NewRegion, NewClinic, EditClinic, NewPerson, EditPerson, NewVisit
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Post, Clinic, Region, User, Person #Visit, Product, RU
+from app.models import Post, Clinic, Region, User, Person, Visit #, Product, RU
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
@@ -118,6 +118,7 @@ def follow(username):
     flash('You are following {}!'.format(username))
     return redirect(url_for('user', username=username))
 
+
 @app.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
@@ -162,6 +163,7 @@ def reset_password_request():
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
 
+
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
@@ -178,7 +180,6 @@ def reset_password(token):
     return render_template('reset_password.html', form=form)
 
 
-
 @app.route('/regions/', methods=['GET', 'POST'])
 @login_required
 def showRegions():
@@ -192,19 +193,6 @@ def showRegions():
     regions = Region.query.order_by(Region.name.asc())
     return render_template('regions.html', title='Regions', form=form, regions=regions)
 
-
-
-#@app.route('/regions/<int:region_id>/delete/', methods=['GET', 'POST'])
-#@login_required
-#def deleteRegion(region_id):
-    #regionToDelete = session.query(Region).filter_by(id=region_id).one()
-    #if request.method == 'POST':
-        #session.delete(regionToDelete)
-        #flash('%s успешно удален' % regionToDelete.name)
-        #session.commit()
-        #return redirect(url_for('showRegions', region_id=region_id))
-    #else:
-        #return render_template('dregion.html', region=regionToDelete)
 
 # Show all clinics in region
 @app.route('/regions/<region_name>/clinics/', methods=['GET', 'POST'])
@@ -233,7 +221,7 @@ def showClinics(region_name):
 @login_required
 def editClinic(clinic_id, region_name):
     clinic = Clinic.query.filter_by(id=clinic_id).one()
-    form = EditClinic(clinic.clinic_name, clinic.inn)
+    form = EditClinic(clinic.clinic_name, clinic.inn, obj=clinic)
     if form.validate_on_submit():
         clinic.clinic_name = form.clinic_name.data
         clinic.inn = form.inn.data
@@ -241,48 +229,25 @@ def editClinic(clinic_id, region_name):
         db.session.commit()
         flash('Изменения сохранены')
         return redirect(url_for('showClinics', region_name=region_name))
-    elif request.method == 'GET':
-        form.clinic_name.data=clinic.clinic_name
-        form.inn.data=clinic.inn
-        form.address.data=clinic.address
     region = Region.query.filter_by(name=region_name).one()
 
     return render_template('edit_clinic.html', title='Edit Clinic',
                            form=form, clinic_id=clinic_id, region_name=region_name)
 
 
-# Delete a Element
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/delete', methods=[
-    #'GET', 'POST'])
-#@login_required
-#def deleteClinic(region_id, clinic_id):
-    #region = session.query(Region).filter_by(id=region_id).one()
-    #clinicToDelete = session.query(Clinic).filter_by(id=clinic_id).one()
-    #if request.method == 'POST':
-        #session.delete(clinicToDelete)
-        #session.commit()
-        #flash('Клиника успешно удалена')
-        #return redirect(url_for('showClinics', region_id=region_id))
-    #else:
-        #return render_template(
-            #'dclinic.html', clinic=clinicToDelete, region=region)
-
-
-# Show all persons
-
 @app.route('/regions/<region_name>/clinics/<int:clinic_id>/persons/', methods=['GET', 'POST'])
 @login_required
 def showPersons(region_name, clinic_id):
     form = NewPerson()
     if form.validate_on_submit():
-        filename = images.save(request.files['picture'])
+        filename = images.save(request.files['picture_url'])
         url = images.url(filename)
-        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, last_visit=form.last_visit.data, next_visit=form.next_visit.data, date_of_request=form.date_of_request.data, author=current_user, clinic_id=clinic_id)
+        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, date_of_request=form.date_of_request.data, author=current_user, clinic_id=clinic_id)
         db.session.add(newPerson)
         db.session.commit()
         flash('Новый клиент "{}" добавлен!'.format(form.name.data))
         return redirect(url_for('showPersons', clinic_id=clinic_id, region_name=region_name))
-    persons = Person.query.order_by(Person.last_visit.desc())
+    persons = Person.query.filter_by(clinic_id=clinic_id).order_by(Person.last_visit.desc())
     clinic = Clinic.query.filter_by(id=clinic_id).one()
     return render_template("persons.html", title='Клиенты', persons=persons, form=form, region_name=region_name, clinic=clinic)
 
@@ -291,171 +256,69 @@ def showPersons(region_name, clinic_id):
 @login_required
 def editPerson(clinic_id, region_name, person_id):
     person = Person.query.filter_by(id=person_id).one()
-    form = EditPerson(person.email, person.phone, person.picture)
+    person.date_of_request = datetime.strptime(person.date_of_request, '%Y-%m-%d %H:%M:%S')
+    form = EditPerson(person.name, person.email, obj=person)
     if form.validate_on_submit():
-        person.name = form.person.data
-        person.comments = form.person.comments
-        person.picture = form.picture.data
+        filename = images.save(request.files['picture_url'])
+        url = images.url(filename)
+        person.name = form.name.data
+        person.comments = form.comments.data
+        person.picture_filename = filename
+        person.picture_url = url
         person.phone = form.phone.data
         person.email = form.email.data
         person.department = form.department.data
-        person.last_visit = form.last_visit.data
-        person.next_visit = form.next_visit.data
         person.date_of_request = form.date_of_request.data
         db.session.commit()
         flash('Изменения сохранены')
         return redirect(url_for('showPersons', region_name=region_name, clinic_id=clinic_id))
-    elif request.method == 'GET':
-        form.clinic_name.data=clinic.clinic_name
-        form.inn.data=clinic.inn
-        form.address.data=clinic.address
-        form.person.name = person.data
-        form.person.comments = person.comments
-        form.person.picture = picture.data
-        form.person.phone = phone.data
-        form.person.email = email.data
-        form.person.department = department.data
-        form.person.last_visit = last_visit.data
-        form.person.next_visit = next_visit.data
-        form.person.date_of_request = date_of_request.data
     region = Region.query.filter_by(name=region_name).one()
 
     return render_template('edit_person.html', title='Edit Client',
-                           form=form, clinic_id=clinic_id, region_name=region_name)
-
-# Create a new Person
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/new', methods=['GET', 'POST'])
-#@login_required
-#def newPerson(clinic_id, region_id):
-    #clinic = session.query(Clinic).filter_by(id=clinic_id).one()
-    #if request.method == 'POST':
-        #file = request.files['file']
-        #if file and allowed_file(file.filename):
-            #filename = secure_filename(file.filename)
-            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            #newPerson = Person(
-                #name=request.form['name'],
-                #picture=filename, phone=request.form['phone'],
-                #email=request.form['email'], last_visit=request.form['last_visit'],
-                #next_visit=request.form['next_visit'], comments=request.form['comments'], department=request.form['department'], date_of_request=request.form['date_of_request'], clinic_id=clinic_id)
-            #session.add(newPerson)
-            #flash('Новый клиент %s Успешно добавлен' % newPerson.name)
-            #session.commit()
-            #return redirect(url_for('showPersons', clinic_id=clinic_id, region_id=region_id))
-        #else:
-            #return responseWith('Bad image.', 422)
-    #else:
-        #return render_template('nperson.html', clinic_id=clinic_id, region_id=region_id)
+                           form=form, person_id=person_id, clinic_id=clinic_id, region_name=region_name)
 
 
-# Edit a Person
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/edit/', methods=['GET', 'POST'])
-#@login_required
-#def editPerson(person_id, region_id, clinic_id):
-    #editedPerson = session.query(Person).filter_by(id=person_id).one()
-    #if request.method == 'POST':
-        #if request.form['date_of_request']:
-            #editedPerson.date_of_request = request.form['date_of_request']
-        #if request.form['next_visit']:
-            #editedPerson.next_visit = request.form['next_visit']
-        #if request.form['last_visit']:
-            #editedPerson.last_visit = request.form['last_visit']
-        #if request.form['comments']:
-            #editedPerson.comments = request.form['comments']
-        #if request.form['department']:
-            #editedPerson.department = request.form['department']
-        #if request.form['email']:
-            #editedPerson.email = request.form['email']
-        #if request.form['phone']:
-            #editedPerson.phone = request.form['phone']
-        #if request.files['file']:
-            #file = request.files['file']
-            #if file and allowed_file(file.filename):
-                #filename = secure_filename(file.filename)
-                #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                #editedPerson.picture = filename
-            #else:
-                #return responseWith('Bad Image', 422)
-        #if request.form['name']:
-            #editedPerson.name = request.form['name']
-        #flash('Клиент %s успешно отредактирован' % editedPerson.name)
-        #return redirect(url_for('showPersons', person_id=person_id, region_id=region_id, clinic_id= clinic_id))
-    #else:
-        #return render_template('eperson.html', person=editedPerson, region_id=region_id, clinic_id= clinic_id)
+@app.route('/regions/<region_name>/clinics/<int:clinic_id>/persons/<int:person_id>/del/', methods=['GET', 'POST'])
+@login_required
+def deletePerson(clinic_id, region_name, person_id):
+    personToDelete = Person.query.filter_by(id=person_id).one()
+    db.session.delete(personToDelete)
+    db.session.commit()
+    flash('Клиент успешно удален')
+    return redirect(url_for('showPersons', region_name=region_name, clinic_id=clinic_id))
 
 
-# Delete a Cake
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/delete/', methods=['GET', 'POST'])
-#@login_required
-#def deletePerson(person_id, region_id, clinic_id):
-    #personToDelete = session.query(Person).filter_by(id=person_id).one()
-    #if request.method == 'POST':
-        #session.delete(personToDelete)
-        #flash('%s успешно удален' % personToDelete.name)
-        #session.commit()
-        #return redirect(url_for('showPersons', person_id=person_id, region_id=region_id, clinic_id= clinic_id))
-    #else:
-        #return render_template('dperson.html', person=personToDelete, region_id=region_id, clinic_id= clinic_id)
+@app.route('/regions/<region_name>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/', methods=['GET', 'POST'])
+@login_required
+def showVisits(region_name, clinic_id, person_id):
+    form = NewVisit()
+    person = Person.query.filter_by(id=person_id).one()
+    if form.validate_on_submit():
+        newVisit = Visit(date=form.date.data, date_of_next_visit=form.date_of_next_visit.data, arrangements=form.arrangements.data, author=current_user, person_id=person_id)
+        person.last_visit=form.date.data
+        person.next_visit=form.date_of_next_visit.data
+        db.session.add(newVisit)
+        db.session.commit()
+        flash('Новый визит к клиенту "{}" добавлен!'.format(person.name))
+        return redirect(url_for('showVisits', clinic_id=clinic_id, region_name=region_name, person_id=person_id))
+
+    visits = Visit.query.filter_by(person_id=person_id).order_by(Visit.date.desc())
+    return render_template("visits.html", title='Визиты', person=person, form=form, visits=visits, clinic_id=clinic_id, region_name=region_name)
 
 
-# Show elements in person
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/')
-#@login_required
-#def showVisits(person_id, region_id, clinic_id):
-    #person = session.query(Person).filter_by(id=person_id).one()
-    #visits = session.query(Visit).filter_by(person_id=person_id).all()
-    #return render_template('visits.html', visits=visits, person=person, clinic_id=clinic_id, region_id=region_id)
-
-
-# Create a new Element
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/new/', methods=['GET', 'POST'])
-#@login_required
-#def newVisit(person_id, region_id, clinic_id):
-    #person = session.query(Person).filter_by(id=person_id).one()
-    #if request.method == 'POST':
-        #newVisit = Visit(date=request.form['date'], arrangements=request.form[
-            #'arrangements'], person_id=person_id, user_id=person.user_id)
-        #session.add(newVisit)
-        #session.commit()
-        #flash('Новый визит от %s числа успешно добавлен' % (newVisit.date))
-        #return redirect(url_for('showVisits', person_id=person_id, clinic_id=clinic_id, region_id=region_id))
-    #else:
-        #return render_template('nvisit.html', person_id=person_id, person=person)
-
-
-# Edit a Element
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/<int:visit_id>/edit', methods=[
-    #'GET', 'POST'])
-#@login_required
-#def editVisit(person_id, region_id, clinic_id, visit_id):
-    #editedVisit = session.query(Visit).filter_by(id=visit_id).one()
-    #person = session.query(Person).filter_by(id=person_id).one()
-    #if request.method == 'POST':
-        #if request.form['date']:
-            #editedVisit.date = request.form['date']
-        #if request.form['arrangements']:
-            #editedVisit.arrangements = request.form['arrangements']
-        #session.add(editedVisit)
-        #session.commit()
-        #flash('Визит успешно отредактирован')
-        #return redirect(url_for('showVisits', person_id=person_id, clinic_id=clinic_id, region_id=region_id))
-    #else:
-        #return render_template(
-            #'evisit.html', person_id=person_id, clinic_id=clinic_id, region_id=region_id,
-            #visit_id=visit_id, visit=editedVisit, person=person)
-
-
-# Delete a Element
-#@app.route('/regions/<int:region_id>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/<int:visit_id>/delete', methods=['GET', 'POST'])
-#@login_required
-#def deleteVisit(person_id, region_id, clinic_id, visit_id):
-    #person = session.query(Person).filter_by(id=person_id).one()
-    #visitToDelete = session.query(Visit).filter_by(id=visit_id).one()
-    #if request.method == 'POST':
-        #session.delete(visitToDelete)
-        #session.commit()
-        #flash('Визит успешно удален')
-        #return redirect(url_for('showVisits', person_id=person_id, clinic_id=clinic_id, region_id=region_id))
-    #else:
-        #return render_template(
-            #'dvisit.html', visit=visitToDelete, person=person, clinic_id=clinic_id, region_id=region_id)
+@app.route('/regions/<region_name>/clinics/<int:clinic_id>/persons/<int:person_id>/visits/del/<int:visit_id>', methods=['GET', 'POST'])
+@login_required
+def deleteVisit(region_name, clinic_id, person_id, visit_id):
+    person = Person.query.filter_by(id=person_id).one()
+    visitToDelete = Visit.query.filter_by(id=visit_id).one()
+    db.session.delete(visitToDelete)
+    lastVisit = Visit.query.filter_by(person_id=person_id).order_by(Visit.date.desc()).first()
+    if not lastVisit:
+        person.last_visit='None'
+        person.next_visit='None'
+    else:
+        person.last_visit=lastVisit.date
+        person.next_visit=lastVisit.date_of_next_visit
+    db.session.commit()
+    flash('Визит успешно удален')
+    return redirect(url_for('showVisits', person_id=person_id, clinic_id=clinic_id, region_name=region_name))

@@ -9,35 +9,35 @@ from app import images
 choices = [('Урологическое','Урологическое'), ('Эндоскопическое', 'Эндоскопическое')]
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    username = StringField('Имя пользователя', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Имя пользователя', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
     password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+        'Повторите пароль', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Зарегистрироваться')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Выберите другое имя пользователя')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Введите другой Email')
 
 
 class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
-    submit = SubmitField('Submit')
+    username = StringField('Имя пользователя', validators=[DataRequired()])
+    about_me = TextAreaField('Обо мне', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Сохранить')
 
     def __init__(self, original_username, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
@@ -47,13 +47,13 @@ class EditProfileForm(FlaskForm):
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
-                raise ValidationError('Please use a different username.')
+                raise ValidationError('Выберите другое имя пользователя')
 
 
 class PostForm(FlaskForm):
-    post = TextAreaField('Say something', validators=[
+    post = TextAreaField('Скажите что-нибудь', validators=[
         DataRequired(), Length(min=1, max=140)])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Отправить')
 
 
 class ResetPasswordRequestForm(FlaskForm):
@@ -71,7 +71,7 @@ class ResetPasswordForm(FlaskForm):
 class NewRegion(FlaskForm):
     region = StringField('Введите название региона', validators=[
         DataRequired(), Length(min=1, max=200)])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Добавить')
 
 
 class NewClinic(FlaskForm):
@@ -81,7 +81,7 @@ class NewClinic(FlaskForm):
         DataRequired(), Length(min=1, max=250)])
     inn = StringField('Введите ИНН клиники', validators=[
         DataRequired(), Length(min=10, max=10, message='Вы ввели неккоректный ИНН')])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Добавить')
 
     def validate_clinic_name(self, clinic_name):
         clinic = Clinic.query.filter_by(clinic_name=clinic_name.data).first()
@@ -101,7 +101,7 @@ class EditClinic(FlaskForm):
         DataRequired(), Length(min=1, max=250)])
     inn = StringField('Введите ИНН клиники', validators=[
         DataRequired(), Length(min=10, max=10, message='Вы ввели неккоректный ИНН')])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Сохранить')
 
     def __init__(self, original_clinic_name, original_clinic_inn, *args, **kwargs):
         super(EditClinic, self).__init__(*args, **kwargs)
@@ -125,19 +125,12 @@ class NewPerson(FlaskForm):
     name = StringField('ФИО', validators=[
         DataRequired(), Length(min=1, max=180)])
     comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
-    picture = FileField('Фотография', validators=[FileRequired(), FileAllowed(images, 'Images only!')])
+    picture_url = FileField('Фотография', validators=[FileRequired(), FileAllowed(images, 'Images only!')])
     phone = StringField('Введите телефон', validators=[Length(min=1, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     department = SelectField('Отделение', choices=choices)
-    last_visit = DateTimeField('Дата последнего визита', format='%d-%m-%Y')
-    next_visit = DateTimeField('Дата следующего визита', format='%d-%m-%Y')
     date_of_request = DateTimeField('Дата подготовки заявки на закуп', format='%d-%m-%Y')
     submit = SubmitField('Добавить', id="submit_id")
-
-    def validate_picture(self, picture):
-        if picture.data:
-            print (picture.data.filename)
-            picture.data = re.sub(r'[^a-z0-9_.-]', '_', str(picture.data))
 
     def validate_email(self, email):
         person = Person.query.filter_by(email=email.data).first()
@@ -148,3 +141,39 @@ class NewPerson(FlaskForm):
         phone = Person.query.filter_by(phone=phone.data).first()
         if phone is not None:
             raise ValidationError('Данный телефон принадлежит другому клиенту')
+
+
+class EditPerson(FlaskForm):
+    name = StringField('ФИО', validators=[
+        DataRequired(), Length(min=1, max=180)])
+    comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
+    picture_url = FileField('Фотография', validators=[FileRequired(), FileAllowed(images, 'Images only!')])
+    phone = StringField('Введите телефон', validators=[Length(min=1, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    department = SelectField('Отделение', choices=choices)
+    date_of_request = DateTimeField('Дата подготовки заявки на закуп', format='%d-%m-%Y')
+    submit = SubmitField('Сохранить изменения', id="submit_id")
+
+    def __init__(self, original_person_name, original_person_email, *args, **kwargs):
+        super(EditPerson, self).__init__(*args, **kwargs)
+        self.original_person_name = original_person_name
+        self.original_person_email = original_person_email
+
+    def validate_name(self, name):
+        if name.data != self.original_person_name:
+            person = Person.query.filter_by(name=name.data).first()
+            if person is not None:
+                raise ValidationError('Клиент с указанным ФИО уже присутствует в базе')
+
+    def validate_email(self, email):
+        if email.data != self.original_person_email:
+            email = Person.query.filter_by(email=email.data).first()
+            if email is not None:
+                raise ValidationError('Клиент с указанной почтой уже присутствует в базе')
+
+
+class NewVisit(FlaskForm):
+    date = DateTimeField('Дата',validators=[DataRequired()], format='%d-%m-%Y')
+    date_of_next_visit = DateTimeField('Дата следующего визита',validators=[DataRequired()], format='%d-%m-%Y')
+    arrangements = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
+    submit = SubmitField('Добавить', id="submit_id")

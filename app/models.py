@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     clinics = db.relationship('Clinic', backref='author', lazy='dynamic')
     persons = db.relationship('Person', backref='author', lazy='dynamic')
-    #visits = db.relationship('Visit', backref='author', lazy='dynamic')
+    visits = db.relationship('Visit', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     followed = db.relationship(
@@ -98,7 +98,7 @@ class Clinic(db.Model):
     address = db.Column(db.String(250), index=True)
     inn = db.Column(db.String(15), nullable=False, unique=True)
     region_name = db.Column(db.String(180), db.ForeignKey('region.name', ondelete='CASCADE'))
-    persons = db.relationship('Person', backref=db.backref("children", cascade="all,delete"), lazy='dynamic')
+    persons = db.relationship('Person', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Person(db.Model):
@@ -115,14 +115,15 @@ class Person(db.Model):
     date_of_request = db.Column(db.String(250))
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    #visits = db.relationship('Visit', backref=db.backref("children", cascade="all,delete"))
+    visits = db.relationship('Visit', lazy='dynamic')
 
-#class Visit(db.Model):
-    #id = db.Column(db.Integer, primary_key = True)
-    #date = db.Column(db.String(80), nullable=False)
-    #arrangements = db.Column(db.String(250), index=True)
-    #person_id = db.Column(db.Integer, db.ForeignKey('person.id', ondelete='CASCADE'))
-    #user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+class Visit(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    date = db.Column(db.String(20), nullable=False)
+    date_of_next_visit = db.Column(db.String(20), nullable=False)
+    arrangements = db.Column(db.String(250), index=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 #class Product(db.Model):
