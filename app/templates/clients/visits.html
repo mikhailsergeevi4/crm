@@ -3,85 +3,87 @@
 
 {% block app_content %}
 
-	<h1>{{ person.name }}</h1>
+<!-- Modal ADD -->
+  <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLongTitle">Новый Визит</h5>
+        </div>
+        <div class="modal-body" id="modal-body">
+          {% if form %}
+            {{ wtf.quick_form(form) }}
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Modal DELETE -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-  <!-- Modal -->
-  	<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-  		<div class="modal-dialog modal-dialog-centered" role="document">
-  			<div class="modal-content">
-  				<div class="modal-header">
-  					<h5 class="modal-title" id="ModalLongTitle">Новый Визит</h5>
-  				</div>
-  				<div class="modal-body" id="modal-body">
-  					{% if form %}
-  						{{ wtf.quick_form(form) }}
-  					{% endif %}
-  				</div>
-  				<div class="modal-footer">
-  					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-  						<span aria-hidden="true">&times;</span>
-  					</button>
-  				</div>
-  			</div>
-  		</div>
-  	</div>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+                </div>
 
+                <div class="modal-body">
+                    <p>Вы уверены что хотите удалить визит?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <a class="btn btn-danger btn-ok">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="card">
+	 <div class="card-body">
+    <h4 class="card-title">{{ person.name }}</h4>
+  </div>
+</div>
 
 
     <div class="row">
-      <div class="col-md-8">
-        <h2>Визиты:</h2>
-      </div>
-
-      <div class="col-md-4">
-  		   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
-    		Добавить визит
-  		 </button>
-  	  </div>
+    		<div class="col-xs-6 col-md-2">
+          <h3>Визиты</h3>
+        </div>
+        <div class='col-xs-6 col-md-2'>
+          <button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
+        </div>
     </div>
 
-    <div class = 'row'>
+
       {% for i in visits %}
-      <div class = 'row'>
-        <div class = 'col-md-6'>
-          {{moment(i.date).format('LL')}}
+      <div class="media">
+        <div class='row'>
+        <div class="col-xs-8 col-md-8 col-sm-8">
+          <h4 class="media-heading">
+            {{moment(i.date).format('LL')}}
+          </h4>
         </div>
-        <div class = 'col-md-6'>
-          <button class="btn btn-default" data-href="{{ url_for('clients.deleteVisit', person_id = person.id,   clinic_id=clinic_id, region_name=region_name, visit_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
-            Удалить
-          </button>
-
-          <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                      <div class="modal-content">
-
-                          <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                              <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
-                          </div>
-
-                          <div class="modal-body">
-                              <p>Вы уверены что хотите удалить визит?</p>
-                          </div>
-
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                              <a class="btn btn-danger btn-ok">Удалить</a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-        </div>
-        <div class="row">
-          <div class = 'col-md-12'>
-          Дата следующего визита: {{moment(i.date_of_next_visit).format('LL')}}
-          </div>
-          <div class = 'col-md-12'>
-          Договоренности: {{i.arrangements}}
+        <div class="col-xs-4 col-md-1 col-1 col-sm-2 pull-right">
+            <button class="btn btn-danger glyphicon glyphicon-remove" data-href="{{ url_for('clients.deleteVisit', person_id = person.id,   clinic_id=clinic_id, region_name=region_name, visit_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
+            </button>
         </div>
       </div>
-      </div>
+          <dt class="col-sm-4">Дата следующего визита:: </dt>
+          <dd class="col-sm-8">{{moment(i.date_of_next_visit).format('LL')}}</dd>
+          <div class="w-100"></div>
+          <dt class="col-sm-4">Договоренности: </dt>
+          <dd class="col-sm-8">	{{i.arrangements}}</dd>
+        </div>
+
+
       {% endfor %}
       <div>
         <a href="{{ url_for('clients.showPersons', region_name=region_name, clinic_id=clinic_id) }}">

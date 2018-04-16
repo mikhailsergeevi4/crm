@@ -12,7 +12,7 @@
             <td>
               {% if post.user_id == current_user.id %}
               <a href="{{ url_for('main.delete_post', post_id=post.id) }}">
-                <span class="glyphicon glyphicon-remove"></span></a>
+                <span class="glyphicon glyphicon-remove pull-right"></span></a>
               {% endif %}
             </td>
         </tr>

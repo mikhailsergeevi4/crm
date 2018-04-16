@@ -2,39 +2,7 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-<div class="row">
-	<div class="col-md-4">
-		<h1>{{clinic.clinic_name}}</h1>
-	</div>
-
-	<div class="col-md-4">
-		<a href="http://zakupki.gov.ru/epz/order/quicksearch/search_eis.html?searchString={{clinic.inn}}" target="_blank">
-			<button class="btn btn-primary" id="new-person">
-				<span class="">Тендеры</span>
-			</button>
-		</a>
-	</div>
-
-	<div class="col-md-4">
-		<a href="https://clearspending.ru/contract/?productsearch=&search-submit=&grbs=&regnum=&daterange=01.01.2017-31.12.2017&price_gte=&price_lte=&customerregion=&address=&budgetlevel=&okdp_okpd=&sort=-signDate&fz=None&customerinn={{clinic.inn}}&customerkpp=&supplierinn=&supplierkpp=&filter=True" target="_blank">
-			<button class="btn btn-primary" id="new-person">
-				<span class="">Контракты</span>
-			</button>
-		</a>
-	</div>
-
-</div>
-<div class="row">
-	<div class="col-md-4">
-		<h1>Клиенты</h1>
-	</div>
-	<div class="col-md-4">
-		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
-  		Добавить клиента
-		</button>
-	</div>
-</div>
-<!-- Modal -->
+<!-- Modal  ADD-->
 	<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
@@ -56,50 +24,98 @@
 	</div>
 
 
-		{% for person in persons %}
-		<table class="table table-hover">
-			<tr>
-				<td>
-						<img class="img-client" src="/uploads/{{person.picture_filename}}" alt="Тут должно быть фото клиента">
-				</td>
-				<td>
+<!-- Modal  DELETE-->
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+						<div class="modal-content">
 
-						<div class='row'>
-							<h5 class='col-md-6'>
-								<a href = "{{url_for('clients.showVisits', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">{{person.name}}</a>
-								</h5>
-							<div class='col-md-4'>
-								<a href = "{{url_for('clients.editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">Редактировать</a>
-							</div>
-							<div class = 'col-md-2'>
-			          <button class="btn btn-default" data-href="{{ url_for('clients.deletePerson', person_id = person.id,   clinic_id=clinic.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
-			            Удалить
-			          </button>
+								<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+								</div>
 
-			          <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			                  <div class="modal-dialog">
-			                      <div class="modal-content">
+								<div class="modal-body">
+										<p>Вы уверены что хотите удалить клиента?</p>
+								</div>
 
-			                          <div class="modal-header">
-			                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			                              <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
-			                          </div>
-
-			                          <div class="modal-body">
-			                              <p>Вы уверены что хотите удалить клиента?</p>
-			                          </div>
-
-			                          <div class="modal-footer">
-			                              <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-			                              <a class="btn btn-danger btn-ok">Удалить</a>
-			                          </div>
-			                      </div>
-			                  </div>
-			              </div>
-
-			        </div>
+								<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+										<a class="btn btn-danger btn-ok">Удалить</a>
+								</div>
 						</div>
-						<dl class="row">
+				</div>
+		</div>
+
+<!-- Modal  MAP-->
+		<div class="modal fade" id="Modal_Map" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+								<div class="modal-content">
+
+										<div class="modal-header">
+
+												<h4 class="modal-title" id="myModalLabel">{{clinic.clinic_name}} на карте</h4>
+										</div>
+
+										<div class="modal-body">
+												<div id="map"></div>
+										</div>
+
+										<div class="modal-footer">
+												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										</div>
+								</div>
+						</div>
+				</div>
+
+
+<div class="card">
+	 <div class="card-body">
+    <h4 class="card-title">{{clinic.clinic_name}}</h4>
+		<h5 id='address'>{{clinic.address }}</h5>
+
+	<div class="btn-group" role="group" aria-label="Basic example">
+			<a href="http://zakupki.gov.ru/epz/order/quicksearch/search_eis.html?searchString={{clinic.inn}}&sortBy=PUBLISH_DATE" target="_blank" class="btn btn-primary">
+			Тендеры
+			</a>
+
+
+			<a href="https://clearspending.ru/contract/?productsearch=&search-submit=&grbs=&regnum=&daterange=01.01.2017-31.12.2017&price_gte=&price_lte=&customerregion=&address=&budgetlevel=&okdp_okpd=&sort=-signDate&fz=None&customerinn={{clinic.inn}}&customerkpp=&supplierinn=&supplierkpp=&filter=True" target="_blank" class="btn btn-primary">Контракты
+			</a>
+
+			<button class="btn btn-primary" data-toggle="modal" data-target="#Modal_Map">
+				<span class="">На карте</span>
+			</button>
+	</div>
+</div>
+<br>
+</div>
+
+<div class="row">
+	<div class="col-xs-6 col-md-2">
+		<h3>Клиенты</h3>
+	</div>
+	<div class='col-xs-6 col-md-2'>
+		<button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
+	</div>
+</div>
+
+
+		{% for person in persons %}
+		<div class="media">
+  		<div class="media-left">
+						<img class="img-client" src="/uploads/{{person.picture_filename}}" alt="Тут должно быть фото клиента">
+						<div class="btn-group btn-group-justified">
+								<a class='btn btn-default glyphicon glyphicon-pencil' href="{{url_for('clients.editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}"></a>
+
+								<a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{ url_for('clients.deletePerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
+								</a>
+					</div>
+			</div>
+			<div class="media-body">
+				<h4 class="media-heading">
+					<a href = "{{url_for('clients.showVisits', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">{{person.name}}</a>
+				</h4>
+
 							<dt class="col-sm-4">Телефон: </dt>
 							<dd class="col-sm-8">{{person.phone}}</dd>
 							<dt class="col-sm-4">Почта: </dt>
@@ -114,16 +130,21 @@
 							<dd class="col-sm-8">	{{person.department}}</dd>
 							<dt class="col-sm-4">Комментарии: </dt>
 							<dd class="col-sm-8">	{{person.comments}}</dd>
-						</dl>
-						</a>
-					</td>
-		  </tr>
-		 </table>
+
+			</div>
+		</div>
 			{% endfor %}
 
-			<a href="{{ url_for('clients.showClinics', region_name=region_name) }}">
-			<p>Назад</p>
 
+				<a href="{{ url_for('clients.showClinics', region_name=region_name) }}">
+					<p>Назад</p>
+				</a>
 
+{% endblock %}
 
+{% block scripts %}
+    {{ super() }}
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAC5uNZ0BrOcQA4TcfyuE2VDiocbHxqFIc&v=3&callback=initMap">
+</script>
 {% endblock %}
