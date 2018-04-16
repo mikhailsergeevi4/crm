@@ -46,6 +46,9 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.clients import bp as clients_bp
+    app.register_blueprint(clients_bp)
+
     configure_uploads(app, images)
 
     app.add_url_rule('/uploads/<filename>', 'uploaded_file',
@@ -53,6 +56,8 @@ def create_app(config_class=Config):
     app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         '/uploads':  app.config['UPLOAD_FOLDER']
     })
+
+    app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:

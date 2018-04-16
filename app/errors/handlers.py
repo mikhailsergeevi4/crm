@@ -11,3 +11,8 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
+
+
+@bp.app_errorhandler(413)
+def request_entity_too_large(error):
+    return render_template('errors/413.html'), 413

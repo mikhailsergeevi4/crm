@@ -120,8 +120,8 @@ class Person(db.Model):
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    date = db.Column(db.String(20), nullable=False)
-    date_of_next_visit = db.Column(db.String(20), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    date_of_next_visit = db.Column(db.DateTime, nullable=False)
     arrangements = db.Column(db.String(250), index=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

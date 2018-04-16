@@ -52,18 +52,45 @@
 				</tr>
 					{% for i in clinics %}
 				<tr>
-					<td><a href='{{url_for('main.showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
+					<td><a href='{{url_for('clients.showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
 					<td>{{i.address}}</td>
 					<td>{{i.inn}}</td>
-					<td><a href='{{url_for('main.editClinic', region_name=region.name, clinic_id = i.id) }}'>Редактировать</a></td>
-					<td></td>
+					<td><a href='{{url_for('clients.editClinic', region_name=region.name, clinic_id = i.id) }}'>Редактировать</a></td>
+					<td>
+            <button class="btn btn-default" data-href="{{ url_for('clients.deleteClinic',clinic_id=i.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
+              Удалить
+            </button>
+
+            <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <p>Вы уверены что хотите удалить клинику?</p>
+                                <p>Все клиенты внутри нее будут так же удалены!</p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                <a class="btn btn-danger btn-ok">Удалить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+          </div></td>
 
 				</tr>
 					{% endfor %}
 			</tbody>
 		</table>
 
-			<a href="{{url_for('main.showRegions') }}">
+			<a href="{{url_for('clients.showRegions') }}">
 			<p>
 				Назад
 			</p>

@@ -7,6 +7,13 @@
                 сказал {{ moment(post.timestamp).fromNow() }}:
                 <br>
                 {{ post.body }}
+
+            </td>
+            <td>
+              {% if post.user_id == current_user.id %}
+              <a href="{{ url_for('main.delete_post', post_id=post.id) }}">
+                <span class="glyphicon glyphicon-remove"></span></a>
+              {% endif %}
             </td>
         </tr>
     </table>

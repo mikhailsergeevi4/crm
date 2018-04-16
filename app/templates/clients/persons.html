@@ -66,13 +66,13 @@
 
 						<div class='row'>
 							<h5 class='col-md-6'>
-								<a href = "{{url_for('main.showVisits', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">{{person.name}}</a>
+								<a href = "{{url_for('clients.showVisits', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">{{person.name}}</a>
 								</h5>
 							<div class='col-md-4'>
-								<a href = "{{url_for('main.editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">Редактировать</a>
+								<a href = "{{url_for('clients.editPerson', person_id = person.id, clinic_id=clinic.id, region_name=region_name)}}">Редактировать</a>
 							</div>
 							<div class = 'col-md-2'>
-			          <button class="btn btn-default" data-href="{{ url_for('main.deletePerson', person_id = person.id,   clinic_id=clinic.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
+			          <button class="btn btn-default" data-href="{{ url_for('clients.deletePerson', person_id = person.id,   clinic_id=clinic.id, region_name=region_name) }}" data-toggle="modal" data-target="#confirm-delete">
 			            Удалить
 			          </button>
 
@@ -121,7 +121,7 @@
 		 </table>
 			{% endfor %}
 
-			<a href="{{ url_for('main.showClinics', region_name=region_name) }}">
+			<a href="{{ url_for('clients.showClinics', region_name=region_name) }}">
 			<p>Назад</p>
 
 
