@@ -1,8 +1,8 @@
-"""Visit class
+"""empty message
 
-Revision ID: d1cb8de1ec19
+Revision ID: 3b5036700055
 Revises: 
-Create Date: 2018-04-12 10:54:10.798498
+Create Date: 2018-04-17 15:46:38.867169
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd1cb8de1ec19'
+revision = '3b5036700055'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -58,6 +58,25 @@ def upgrade():
     with op.batch_alter_table('region', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_region_name'), ['name'], unique=True)
 
+    op.create_table('tender',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('number', sa.Integer(), nullable=True),
+    sa.Column('end_date', sa.DateTime(), nullable=True),
+    sa.Column('game_date', sa.DateTime(), nullable=True),
+    sa.Column('ground', sa.String(length=100), nullable=True),
+    sa.Column('company', sa.String(length=100), nullable=True),
+    sa.Column('notes', sa.String(length=250), nullable=True),
+    sa.Column('contract', sa.DateTime(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('number')
+    )
+    with op.batch_alter_table('tender', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_tender_company'), ['company'], unique=False)
+        batch_op.create_index(batch_op.f('ix_tender_ground'), ['ground'], unique=False)
+        batch_op.create_index(batch_op.f('ix_tender_notes'), ['notes'], unique=False)
+
     op.create_table('clinic',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('clinic_name', sa.String(length=180), nullable=True),
@@ -79,13 +98,14 @@ def upgrade():
     sa.Column('name', sa.String(length=250), nullable=True),
     sa.Column('comments', sa.String(length=250), nullable=True),
     sa.Column('picture_filename', sa.String(length=250), nullable=True),
-    sa.Column('picture_url', sa.String(), nullable=True),
+    sa.Column('picture_url', sa.String(length=100), nullable=True),
     sa.Column('phone', sa.String(length=20), nullable=True),
     sa.Column('email', sa.String(length=180), nullable=True),
     sa.Column('department', sa.String(length=100), nullable=True),
-    sa.Column('last_visit', sa.String(length=20), nullable=True),
-    sa.Column('next_visit', sa.String(length=20), nullable=True),
-    sa.Column('date_of_request', sa.String(length=250), nullable=True),
+    sa.Column('last_visit', sa.DateTime(), nullable=True),
+    sa.Column('next_visit', sa.DateTime(), nullable=True),
+    sa.Column('date_of_request', sa.DateTime(), nullable=True),
+    sa.Column('date_of_request2', sa.DateTime(), nullable=True),
     sa.Column('clinic_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['clinic_id'], ['clinic.id'], ondelete='CASCADE'),
@@ -101,8 +121,8 @@ def upgrade():
 
     op.create_table('visit',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('date', sa.String(length=20), nullable=False),
-    sa.Column('date_of_next_visit', sa.String(length=20), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('date_of_next_visit', sa.DateTime(), nullable=False),
     sa.Column('arrangements', sa.String(length=250), nullable=True),
     sa.Column('person_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -135,6 +155,12 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_clinic_address'))
 
     op.drop_table('clinic')
+    with op.batch_alter_table('tender', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_tender_notes'))
+        batch_op.drop_index(batch_op.f('ix_tender_ground'))
+        batch_op.drop_index(batch_op.f('ix_tender_company'))
+
+    op.drop_table('tender')
     with op.batch_alter_table('region', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_region_name'))
 
