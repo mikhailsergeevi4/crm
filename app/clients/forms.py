@@ -7,7 +7,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from app import images
 import re
 
-choices = [('Урологическое','Урологическое'), ('Эндоскопическое', 'Эндоскопическое')]
+choices = [('Урологическое','Урологическое'), ('Эндоскопическое', 'Эндоскопическое'), ('Администрация', 'Администрация'), ('ВРТ', 'ВРТ'), ('Рентгенхирургическое', 'Рентгенхирургическое')]
 
 
 class NewRegion(FlaskForm):
@@ -67,11 +67,12 @@ class NewPerson(FlaskForm):
     name = StringField('ФИО', validators=[
         DataRequired(), Length(min=1, max=180)])
     comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
-    picture_url = FileField('Фотография', validators=[FileRequired(), FileAllowed(images, 'Images only!')])
+    picture_url = FileField('Фотография', validators=[FileAllowed(images, 'Images only!')])
     phone = StringField('Введите телефон', validators=[Length(min=1, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     department = SelectField('Отделение', choices=choices)
     date_of_request = DateField('Дата подготовки заявки на закуп')
+    date_of_request2 = DateField('Дата подготовки заявки на закуп')
     submit = SubmitField('Добавить', id="submit_id")
 
     def validate_email(self, email):
@@ -89,11 +90,12 @@ class EditPerson(FlaskForm):
     name = StringField('ФИО', validators=[
         DataRequired(), Length(min=1, max=180)])
     comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
-    picture_url = FileField('Фотография', validators=[FileRequired(), FileAllowed(images, 'Images only!')])
+    picture_url = FileField('Фотография', validators=[FileAllowed(images, 'Images only!')])
     phone = StringField('Введите телефон', validators=[Length(min=1, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     department = SelectField('Отделение', choices=choices)
     date_of_request = DateField('Дата подготовки заявки на закуп')
+    date_of_request2 = DateField('Дата подготовки заявки на закуп')
     submit = SubmitField('Сохранить изменения', id="submit_id")
 
     def __init__(self, original_person_name, original_person_email, *args, **kwargs):

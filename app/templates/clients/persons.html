@@ -126,6 +126,10 @@
 							<dd class="col-sm-8">	{{ moment(person.next_visit).format('LL') }}</dd>
 							<dt class="col-sm-4">Готовит заявку: </dt>
 							<dd class="col-sm-8">	{{ moment(person.date_of_request).format('LL') }}</dd>
+							{% if person.date_of_request != person.date_of_request2 %}
+							<dt class="col-sm-4">Готовит заявку: </dt>
+							<dd class="col-sm-8">	{{ moment(person.date_of_request2).format('LL') }}</dd>
+							{% endif %}
 							<dt class="col-sm-4">Отделение: </dt>
 							<dd class="col-sm-8">	{{person.department}}</dd>
 							<dt class="col-sm-4">Комментарии: </dt>

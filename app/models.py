@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
     clinics = db.relationship('Clinic', backref='author', lazy='dynamic')
     persons = db.relationship('Person', backref='author', lazy='dynamic')
     visits = db.relationship('Visit', backref='author', lazy='dynamic')
+    tenders = db.relationship('Tender', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     followed = db.relationship(
@@ -106,14 +107,15 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(250), index=True)
     comments = db.Column(db.String(250), index=True)
-    picture_filename = db.Column(db.String(250), default=None, nullable=True)
-    picture_url = db.Column(db.String, default=None, nullable=True)
+    picture_filename = db.Column(db.String(250), nullable=True)
+    picture_url = db.Column(db.String, nullable=True)
     phone = db.Column(db.String(20), index=True, unique=True)
     email = db.Column(db.String(180), index=True, unique=True)
     department = db.Column(db.String(100), index=True)
     last_visit = db.Column(db.DateTime)
     next_visit = db.Column(db.DateTime)
     date_of_request = db.Column(db.DateTime)
+    date_of_request2 = db.Column(db.DateTime, default='')
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visits = db.relationship('Visit', lazy='dynamic')
@@ -125,6 +127,18 @@ class Visit(db.Model):
     arrangements = db.Column(db.String(250), index=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class Tender(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    number = db.Column(db.Integer, unique=True)
+    end_date = db.Column(db.DateTime)
+    game_date = db.Column(db.DateTime)
+    ground = db.Column(db.String(100), index=True)
+    company = db.Column(db.String(100), index=True)
+    notes = db.Column(db.String(250), index=True)
+    contract = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 
 #class Product(db.Model):

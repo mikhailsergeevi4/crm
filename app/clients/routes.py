@@ -3,10 +3,9 @@ from flask_login import current_user, login_required
 from app import db, images
 from app.clients import bp
 from app.clients.forms import NewRegion, NewClinic, EditClinic, NewPerson, EditPerson, NewVisit
-from app.models import Post, Clinic, Region, User, Person, Visit
-from app.auth.email import send_password_reset_email
+from app.models import Clinic, Region, Person, Visit
 from werkzeug import secure_filename
-from datetime import datetime
+
 
 
 @bp.route('/regions/', methods=['GET', 'POST'])
@@ -78,9 +77,13 @@ def editClinic(clinic_id, region_name):
 def showPersons(region_name, clinic_id):
     form = NewPerson()
     if form.validate_on_submit():
-        filename = images.save(request.files['picture_url'])
-        url = images.url(filename)
-        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, date_of_request=form.date_of_request.data, author=current_user, clinic_id=clinic_id)
+        if not form.picture_url.data:
+             filename = '-.png'
+             url = 'images/-.png'
+        else:
+            filename = images.save(request.files['picture_url'])
+            url = images.url(filename)
+        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, date_of_request=form.date_of_request.data, date_of_request2=form.date_of_request2.data, author=current_user, clinic_id=clinic_id)
         db.session.add(newPerson)
         db.session.commit()
         flash('Новый клиент "{}" добавлен!'.format(form.name.data))
@@ -96,8 +99,12 @@ def editPerson(clinic_id, region_name, person_id):
     person = Person.query.filter_by(id=person_id).one()
     form = EditPerson(person.name, person.email, obj=person)
     if form.validate_on_submit():
-        filename = images.save(request.files['picture_url'])
-        url = images.url(filename)
+        if form.picture_url.data == person.picture_url:
+             url = form.picture_url.data
+             filename = person.picture_filename
+        else:
+            filename = images.save(request.files['picture_url'])
+            url = images.url(filename)
         person.name = form.name.data
         person.comments = form.comments.data
         person.picture_filename = filename
@@ -106,11 +113,10 @@ def editPerson(clinic_id, region_name, person_id):
         person.email = form.email.data
         person.department = form.department.data
         person.date_of_request = form.date_of_request.data
+        person.date_of_request2 = form.date_of_request2.data
         db.session.commit()
         flash('Изменения сохранены')
         return redirect(url_for('clients.showPersons', region_name=region_name, clinic_id=clinic_id))
-    region = Region.query.filter_by(name=region_name).one()
-
     return render_template('/clients/edit_person.html', title='Edit Client',
                            form=form, person_id=person_id, clinic_id=clinic_id, region_name=region_name)
 

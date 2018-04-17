@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<!-- Modal ADD -->
+  <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLongTitle">Новый тендер</h5>
+        </div>
+        <div class="modal-body" id="modal-body">
+          {% if form %}
+            {{ wtf.quick_form(form) }}
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal DELETE -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+      </div>
+
+      <div class="modal-body">
+        <p>Вы уверены что хотите удалить тендер?</p>
+
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+              <a class="btn btn-danger btn-ok">Удалить</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="row">
+      <div class="col-xs-6 col-md-2">
+        <h3>Тендеры</h3>
+      </div>
+      <div class='col-xs-6 col-md-2'>
+        <button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
+      </div>
+  </div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Номер</th>
+					<th>Дата окончания подачи</th>
+					<th>Дата проведения</th>
+					<th>Площадка</th>
+          <th>Компания</th>
+          <th>Примечания</th>
+          <th>Подписать до</th>
+          <th></th>
+          <th></th>
+				</tr>
+			</thead>
+			<tbody id="myTable">
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+				</tr>
+					{% for i in tenders %}
+				<tr>
+					<td><a href='http://zakupki.gov.ru/epz/order/notice/ea44/view/common-info.html?regNumber={{i.number}}'  target="_blank">{{i.number}}</a></td>
+          {% if moment(date).format('LL') > moment(i.end_date).format('LL') %}
+					  <td class='danger'>{{ moment(i.end_date).format('LL')}}</td>
+          {% else %}
+            <td>{{moment(i.end_date).format('LL')}}</td>
+          {% endif %}
+					<td>{{moment(i.game_date).format('LL')}}</td>
+          <td>{{i.ground}}</td>
+          <td>{{i.company}}</td>
+          <td>{{i.notes}}</td>
+          {% if moment(date).format('LL') > moment(i.contract).format('LL') %}
+          <td class='danger'>{{moment(i.contract).format('LL')}}</td>
+          {% else %}
+          <td>{{moment(i.contract).format('LL')}}</td>
+          {% endif %}
+          <td>  <a class="btn btn-default glyphicon glyphicon-pencil" href='{{url_for('tender.editTender', tender_id = i.id) }}'></a>
+          </td>
+					<td>
+            <a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{ url_for('tender.deleteTender',tender_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
+            </a>
+
+        </td>
+
+
+				</tr>
+					{% endfor %}
+			</tbody>
+		</table>
+
+			<a href="{{url_for('main.index') }}">
+			<p>
+				Назад
+			</p>
+{% endblock %}
