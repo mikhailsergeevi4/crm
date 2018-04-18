@@ -148,7 +148,7 @@
 
 {% block scripts %}
     {{ super() }}
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAC5uNZ0BrOcQA4TcfyuE2VDiocbHxqFIc&v=3">
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAC5uNZ0BrOcQA4TcfyuE2VDiocbHxqFIc&v=3callback=initMap">
 		</script>
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 
