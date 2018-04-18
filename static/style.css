@@ -1,2 +1,6 @@
 
 .img-client{width: 150px;height: 150px;padding-bottom: 5px;}.card{border-bottom:1px solid #ccc;}.add{margin-top:15px;}.media{border: 1px solid #ccc;border-radius:5px;padding: 10px;}
+
+#map {
+  height: 300px;
+}
