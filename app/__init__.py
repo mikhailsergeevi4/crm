@@ -60,6 +60,20 @@ def create_app(config_class=Config):
         '/uploads':  app.config['UPLOAD_FOLDER']
     })
 
+
+    class CustomProxyFix(object):
+        def __init__(self, app):
+            self.app = app
+
+        def __call__(self, environ, start_response):
+            host = environ.get('HTTP_X_FHOST', '')
+            if host:
+                environ['HTTP_HOST'] = host
+            return self.app(environ, start_response)
+
+    app.wsgi_app = CustomProxyFix(app.wsgi_app)
+
+
     app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
     if not app.debug and not app.testing:
