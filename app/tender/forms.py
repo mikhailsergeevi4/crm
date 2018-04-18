@@ -8,7 +8,7 @@ choices_ground = [('Сбербанк-АСТ','Сбербанк-АСТ'), ('РТ�
 choices_company = [('ШАГ-Урал','ШАГ-Урал'), ('УМТК', 'УМТК')]
 
 class NewTender(FlaskForm):
-    number = IntegerField('Номер аукциона', validators=[DataRequired()])
+    number = StringField('Номер аукциона', validators=[DataRequired()])
     end_date = DateField('Дата окончания подачи заявок')
     game_date = DateField('Дата проведения ауцкиона')
     ground = SelectField('Площадка', choices=choices_ground)

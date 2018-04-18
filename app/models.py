@@ -130,7 +130,7 @@ class Visit(db.Model):
 
 class Tender(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    number = db.Column(db.Integer, unique=True)
+    number = db.Column(db.String(30), unique=True)
     end_date = db.Column(db.DateTime)
     game_date = db.Column(db.DateTime)
     ground = db.Column(db.String(100), index=True)
