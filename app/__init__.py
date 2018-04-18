@@ -11,7 +11,7 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from werkzeug import SharedDataMiddleware
-
+from werkzeug.contrib.fixers import ProxyFix
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -60,18 +60,7 @@ def create_app(config_class=Config):
         '/uploads':  app.config['UPLOAD_FOLDER']
     })
 
-
-    class CustomProxyFix(object):
-        def __init__(self, app):
-            self.app = app
-
-        def __call__(self, environ, start_response):
-            host = environ.get('HTTP_X_FHOST', '')
-            if host:
-                environ['HTTP_HOST'] = host
-            return self.app(environ, start_response)
-
-    app.wsgi_app = CustomProxyFix(app.wsgi_app)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
     app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024

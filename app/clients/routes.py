@@ -157,8 +157,8 @@ def deleteVisit(region_name, clinic_id, person_id, visit_id):
     db.session.delete(visitToDelete)
     lastVisit = Visit.query.filter_by(person_id=person_id).order_by(Visit.date.desc()).first()
     if not lastVisit:
-        person.last_visit='None'
-        person.next_visit='None'
+        person.last_visit=None
+        person.next_visit=None
     else:
         person.last_visit = lastVisit.date
         person.next_visit = lastVisit.date_of_next_visit

@@ -115,7 +115,7 @@ class Person(db.Model):
     last_visit = db.Column(db.DateTime)
     next_visit = db.Column(db.DateTime)
     date_of_request = db.Column(db.DateTime)
-    date_of_request2 = db.Column(db.DateTime, default='')
+    date_of_request2 = db.Column(db.DateTime)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visits = db.relationship('Visit', lazy='dynamic')
