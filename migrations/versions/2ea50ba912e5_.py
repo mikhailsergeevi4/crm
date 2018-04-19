@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3b5036700055
+Revision ID: 2ea50ba912e5
 Revises: 
-Create Date: 2018-04-17 15:46:38.867169
+Create Date: 2018-04-19 13:06:28.441794
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3b5036700055'
+revision = '2ea50ba912e5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,27 @@ def upgrade():
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_user_email'), ['email'], unique=True)
         batch_op.create_index(batch_op.f('ix_user_username'), ['username'], unique=True)
+
+    op.create_table('contract',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company', sa.String(length=100), nullable=True),
+    sa.Column('ground', sa.String(length=100), nullable=True),
+    sa.Column('customer', sa.String(length=100), nullable=True),
+    sa.Column('number', sa.String(length=50), nullable=True),
+    sa.Column('sign_date', sa.DateTime(), nullable=True),
+    sa.Column('supply', sa.String(length=20), nullable=True),
+    sa.Column('notes', sa.String(length=250), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('number'),
+    sa.UniqueConstraint('supply')
+    )
+    with op.batch_alter_table('contract', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_contract_company'), ['company'], unique=False)
+        batch_op.create_index(batch_op.f('ix_contract_customer'), ['customer'], unique=False)
+        batch_op.create_index(batch_op.f('ix_contract_ground'), ['ground'], unique=False)
+        batch_op.create_index(batch_op.f('ix_contract_notes'), ['notes'], unique=False)
 
     op.create_table('followers',
     sa.Column('follower_id', sa.Integer(), nullable=True),
@@ -60,13 +81,13 @@ def upgrade():
 
     op.create_table('tender',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('number', sa.Integer(), nullable=True),
+    sa.Column('number', sa.String(length=30), nullable=True),
+    sa.Column('customer', sa.String(length=100), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('game_date', sa.DateTime(), nullable=True),
     sa.Column('ground', sa.String(length=100), nullable=True),
     sa.Column('company', sa.String(length=100), nullable=True),
     sa.Column('notes', sa.String(length=250), nullable=True),
-    sa.Column('contract', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -74,6 +95,7 @@ def upgrade():
     )
     with op.batch_alter_table('tender', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_tender_company'), ['company'], unique=False)
+        batch_op.create_index(batch_op.f('ix_tender_customer'), ['customer'], unique=False)
         batch_op.create_index(batch_op.f('ix_tender_ground'), ['ground'], unique=False)
         batch_op.create_index(batch_op.f('ix_tender_notes'), ['notes'], unique=False)
 
@@ -84,7 +106,7 @@ def upgrade():
     sa.Column('inn', sa.String(length=15), nullable=False),
     sa.Column('region_name', sa.String(length=180), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['region_name'], ['region.name'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['region_name'], ['region.name'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('inn')
@@ -106,9 +128,11 @@ def upgrade():
     sa.Column('next_visit', sa.DateTime(), nullable=True),
     sa.Column('date_of_request', sa.DateTime(), nullable=True),
     sa.Column('date_of_request2', sa.DateTime(), nullable=True),
+    sa.Column('region_name', sa.String(length=180), nullable=True),
     sa.Column('clinic_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['clinic_id'], ['clinic.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['region_name'], ['region.name'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -158,6 +182,7 @@ def downgrade():
     with op.batch_alter_table('tender', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_tender_notes'))
         batch_op.drop_index(batch_op.f('ix_tender_ground'))
+        batch_op.drop_index(batch_op.f('ix_tender_customer'))
         batch_op.drop_index(batch_op.f('ix_tender_company'))
 
     op.drop_table('tender')
@@ -170,6 +195,13 @@ def downgrade():
 
     op.drop_table('post')
     op.drop_table('followers')
+    with op.batch_alter_table('contract', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_contract_notes'))
+        batch_op.drop_index(batch_op.f('ix_contract_ground'))
+        batch_op.drop_index(batch_op.f('ix_contract_customer'))
+        batch_op.drop_index(batch_op.f('ix_contract_company'))
+
+    op.drop_table('contract')
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_user_username'))
         batch_op.drop_index(batch_op.f('ix_user_email'))

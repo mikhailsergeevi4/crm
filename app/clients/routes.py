@@ -83,7 +83,7 @@ def showPersons(region_name, clinic_id):
         else:
             filename = images.save(request.files['picture_url'])
             url = images.url(filename)
-        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, date_of_request=form.date_of_request.data, date_of_request2=form.date_of_request2.data, author=current_user, clinic_id=clinic_id)
+        newPerson = Person(name=form.name.data, comments=form.comments.data, picture_filename=filename, picture_url=url, phone=form.phone.data, email=form.email.data, department=form.department.data, date_of_request=form.date_of_request.data, date_of_request2=form.date_of_request2.data, author=current_user, region_name=region_name, clinic_id=clinic_id)
         db.session.add(newPerson)
         db.session.commit()
         flash('Новый клиент "{}" добавлен!'.format(form.name.data))

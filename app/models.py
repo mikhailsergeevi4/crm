@@ -23,6 +23,8 @@ class User(UserMixin, db.Model):
     persons = db.relationship('Person', backref='author', lazy='dynamic')
     visits = db.relationship('Visit', backref='author', lazy='dynamic')
     tenders = db.relationship('Tender', backref='author', lazy='dynamic')
+    contracts = db.relationship('Contract', backref='author', lazy='dynamic')
+    forget = db.relationship('DoNotForget', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     followed = db.relationship(
@@ -93,13 +95,14 @@ class Region(db.Model):
     name = db.Column(db.String(180), index=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     clinics = db.relationship('Clinic')
+    persons = db.relationship('Person')
 
 class Clinic(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     clinic_name = db.Column(db.String(180), index=True, unique=True)
     address = db.Column(db.String(250), index=True)
     inn = db.Column(db.String(15), nullable=False, unique=True)
-    region_name = db.Column(db.String(180), db.ForeignKey('region.name', ondelete='CASCADE'))
+    region_name = db.Column(db.String(180), db.ForeignKey('region.name'))
     persons = db.relationship('Person', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -116,6 +119,7 @@ class Person(db.Model):
     next_visit = db.Column(db.DateTime)
     date_of_request = db.Column(db.DateTime)
     date_of_request2 = db.Column(db.DateTime)
+    region_name = db.Column(db.String(180), db.ForeignKey('region.name'))
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visits = db.relationship('Visit', lazy='dynamic')
@@ -131,15 +135,30 @@ class Visit(db.Model):
 class Tender(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     number = db.Column(db.String(30), unique=True)
+    customer = db.Column(db.String(100), index=True)
     end_date = db.Column(db.DateTime)
     game_date = db.Column(db.DateTime)
     ground = db.Column(db.String(100), index=True)
     company = db.Column(db.String(100), index=True)
     notes = db.Column(db.String(250), index=True)
-    contract = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
+class Contract(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    company = db.Column(db.String(100), index=True)
+    ground = db.Column(db.String(100), index=True)
+    customer = db.Column(db.String(100), index=True)
+    number = db.Column(db.String(50), unique=True)
+    sign_date = db.Column(db.DateTime)
+    supply = db.Column(db.String(20), unique=True)
+    notes = db.Column(db.String(250), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class DoNotForget(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    notes = db.Column(db.String(250), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 #class Product(db.Model):
     #id = db.Column(db.Integer, primary_key = True)

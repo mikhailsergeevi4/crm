@@ -8,7 +8,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalLongTitle">Новый тендер</h5>
+          <h5 class="modal-title" id="ModalLongTitle">Новый контракт</h5>
         </div>
         <div class="modal-body" id="modal-body">
           {% if form %}
@@ -34,7 +34,7 @@
       </div>
 
       <div class="modal-body">
-        <p>Вы уверены что хотите удалить тендер?</p>
+        <p>Вы уверены что хотите удалить контракт?</p>
 
       </div>
 
@@ -46,32 +46,11 @@
   </div>
 </div>
 
-<!-- Modal WIN -->
-<div id="win" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Подтверждение победы</h4>
-      </div>
-
-      <div class="modal-body">
-        <p>Вы уверены что выйграли тендер?</p>
-        <p>Данный тендер будет перемещен в раздел Контракты</p>
-      </div>
-
-      <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-              <button class="btn btn-success btn-ok">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
   <div class="row">
       <div class="col-xs-6 col-md-2">
-        <h3>Тендеры</h3>
+        <h3>Контракты</h3>
       </div>
       <div class='col-xs-6 col-md-2'>
         <button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
@@ -82,13 +61,12 @@
 			<thead>
 				<tr>
 					<th>Номер</th>
-					<th>Дата окончания подачи</th>
-					<th>Дата проведения</th>
+					<th>Дата окончания срока подписания</th>
+					<th>Размер обеспечения</th>
 					<th>Площадка</th>
           <th>Компания</th>
           <th>Примечания</th>
           <th>Заказчик</th>
-          <th></th>
           <th></th>
           <th></th>
 				</tr>
@@ -104,31 +82,28 @@
           <th></th>
           <th></th>
           <th></th>
-          <th></th>
 				</tr>
-					{% for i in tenders %}
+					{% for i in contracts %}
 				<tr>
 					<td><a href='http://zakupki.gov.ru/epz/order/notice/ea44/view/common-info.html?regNumber={{i.number}}'  target="_blank">{{i.number}}</a></td>
-          {% if moment(date).format('LL') > moment(i.end_date).format('LL') %}
-					  <td class='danger'>{{ moment(i.end_date).format('LL')}}</td>
+          {% if moment(date).format('LL') > moment(i.sign_date).format('LL') %}
+					  <td class='danger'>{{ moment(i.sign_date).format('LL')}}</td>
           {% else %}
-            <td>{{moment(i.end_date).format('LL')}}</td>
+            <td>{{moment(i.sign_date).format('LL')}}</td>
           {% endif %}
-					<td>{{moment(i.game_date).format('LL')}}</td>
+					<td>{{i.supply}}</td>
           <td>{{i.ground}}</td>
           <td>{{i.company}}</td>
           <td>{{i.notes}}</td>
           <td>{{i.customer}}</td>
-
-          <td>  <a class="btn btn-default glyphicon glyphicon-pencil" href='{{url_for('tender.editTender', tender_id = i.id) }}'></a>
+          <td>  <a class="btn btn-default glyphicon glyphicon-pencil" href='{{url_for('contract.editContract', contract_id=i.id) }}'></a>
           </td>
 					<td>
-            <a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{ url_for('tender.deleteTender',tender_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
+            <a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{url_for('contract.deleteContract', contract_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
             </a>
-          </td>
-          <td><a class="btn btn-success glyphicon glyphicon-ok" href="{{ url_for('tender.winTender', tender_id=i.id) }}">
-          </a>
-          </td>
+
+        </td>
+
 
 				</tr>
 					{% endfor %}

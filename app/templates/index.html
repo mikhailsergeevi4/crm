@@ -2,26 +2,102 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Привет, {{ current_user.username }}!</h1>
-    {% if form %}
-    {{ wtf.quick_form(form) }}
-    <br>
-    {% endif %}
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
-    <nav aria-label="...">
-        <ul class="pager">
-            <li class="previous{% if not prev_url %} disabled{% endif %}">
-                <a href="{{ prev_url or '#' }}">
-                    <span aria-hidden="true">&larr;</span> Новые сообщения
-                </a>
-            </li>
-            <li class="next{% if not next_url %} disabled{% endif %}">
-                <a href="{{ next_url or '#' }}">
-                    Старые сообщения <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+
+<!-- Modal ADD -->
+  <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLongTitle">Новое напоминание</h5>
+        </div>
+        <div class="modal-body" id="modal-body">
+          {% if form %}
+            {{ wtf.quick_form(form) }}
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% if tenders %}
+<div class="card">
+  <h4><a href="{{ url_for('tender.showTenders') }}">Предстоящие тендеры </a></h4>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Заказчик</th>
+      <th>Подача</th>
+      <th>Игра</th>
+    </tr>
+  </thead>
+  <tbody id="myTable">
+{% for i in tenders %}
+<tr>
+  <td>{{i.customer}}</td>
+  <td>{{moment(i.end_date).format('LL')}}</td>
+  <td>{{moment(i.game_date).format('LL')}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+<br>
+{% if persons %}
+<div class="card">
+  <h4>Предстоящие визиты</h4>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>ФИО</th>
+      <th>Когда</th>
+    </tr>
+  </thead>
+  <tbody id="myTable">
+{% for i in persons %}
+<tr>
+  <td><a href="{{ url_for('clients.showPersons', region_name=i.region_name, clinic_id = i.clinic_id) }}">  {{i.name }}</a></td>
+  <td>{{moment(i.next_visit).format('LL')}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+<br>
+<div class="row">
+    <div class="col-xs-6 col-md-2">
+      <h3>Не забыть</h3>
+    </div>
+    <div class='col-xs-6 col-md-2'>
+      <button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
+    </div>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="myTable">
+{% if infos %}
+{% for i in infos %}
+  <tr>
+    <td>{{i.notes}}</td>
+    <td><a class="btn btn-sm btn-success glyphicon glyphicon-ok" href="{{url_for('main.deleteInfo', info_id=i.id) }}">
+    </a></td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
 {% endblock %}

@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import render_template, flash, redirect, request,\
     url_for, send_from_directory, jsonify, current_app
 from app import db
-from app.main.forms import  EditProfileForm, PostForm
+from app.main.forms import  EditProfileForm, PostForm, AddInfo
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Post, User
+from app.models import Post, User, Clinic, Tender, Contract, Person, DoNotForget
 from app.main import bp
 
 
@@ -14,25 +14,25 @@ from app.main import bp
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    form = PostForm()
+    date = datetime.today() + timedelta(20)
+    form = AddInfo()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
-        db.session.add(post)
+        info = DoNotForget(notes=form.notes.data, author=current_user)
+        db.session.add(info)
         db.session.commit()
-        flash('Ваше сообщение опубликовано')
         return redirect(url_for('main.index'))
-    page = request.args.get('page', 1, type=int)
-    posts = current_user.followed_posts().paginate(
-        page, current_app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('main.index', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('main.index', page=posts.prev_num) \
-        if posts.has_prev else None
-    return render_template('index.html', title='Home', form=form,
-                           posts=posts.items, next_url=next_url, prev_url=prev_url)
+    infos = DoNotForget.query.filter_by(user_id=current_user.id).all()
+    tenders = Tender.query.filter_by(user_id=current_user.id).order_by(Tender.end_date.asc()).all()
+    persons = Person.query.filter_by(user_id=current_user.id).filter(Person.next_visit < date).order_by(Person.next_visit.asc()).all()
+    return render_template('index.html', title='Home', tenders=tenders, persons=persons, form=form, infos=infos)
 
-
-
+@bp.route('/del/<int:info_id>', methods=['GET', 'POST'])
+@login_required
+def deleteInfo(info_id):
+    infoToDelete = DoNotForget.query.filter_by(id=info_id).one()
+    db.session.delete(infoToDelete)
+    db.session.commit()
+    return redirect(url_for('main.index'))
 
 @bp.route('/user/<username>')
 @login_required
@@ -100,9 +100,16 @@ def unfollow(username):
 
 
 
-@bp.route('/explore')
+@bp.route('/explore', methods=['GET', 'POST'])
 @login_required
 def explore():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Ваше сообщение опубликовано')
+        return redirect(url_for('main.explore'))
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
@@ -110,15 +117,15 @@ def explore():
         if posts.has_next else None
     prev_url = url_for('main.explore', page=posts.prev_num) \
         if posts.has_prev else None
-    return render_template("index.html", title='Explore', posts=posts.items,
+    return render_template("chat.html", title='Explore', posts=posts.items, form=form,
                           next_url=next_url, prev_url=prev_url)
 
 
-@bp.route('/del/<int:post_id>', methods=['GET', 'POST'])
+@bp.route('/delete/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def delete_post(post_id):
     postToDelete = Post.query.filter_by(id=post_id).one()
     db.session.delete(postToDelete)
     db.session.commit()
     flash('Сообщение было удалено')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.explore'))
