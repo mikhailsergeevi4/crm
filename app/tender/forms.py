@@ -37,11 +37,14 @@ class EditTender(FlaskForm):
     ground = SelectField('Площадка', choices=choices_ground)
     company = SelectField('Компания', choices=choices_company)
     notes = TextAreaField('Примечания')
-    customer = SelectField('Заказчик', choices=choices_company)
+    customer = SelectField('Заказчик')
     submit = SubmitField('Сохранить изменения')
 
     def __init__(self, original_number, *args, **kwargs):
         super(EditTender, self).__init__(*args, **kwargs)
+        clinics = Clinic.query.all()
+        choices = [(g.clinic_name, g.clinic_name) for g in Clinic.query.all()]
+        self.customer.choices = choices
         self.original_number = original_number
 
 

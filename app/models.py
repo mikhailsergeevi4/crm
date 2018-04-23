@@ -103,7 +103,7 @@ class Clinic(db.Model):
     address = db.Column(db.String(250), index=True)
     inn = db.Column(db.String(15), nullable=False, unique=True)
     region_name = db.Column(db.String(180), db.ForeignKey('region.name'))
-    persons = db.relationship('Person', lazy='dynamic')
+    persons = db.relationship('Person', lazy='dynamic', cascade="all,delete", backref="parent")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Person(db.Model):
@@ -120,7 +120,7 @@ class Person(db.Model):
     date_of_request = db.Column(db.DateTime)
     date_of_request2 = db.Column(db.DateTime)
     region_name = db.Column(db.String(180), db.ForeignKey('region.name'))
-    clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id', ondelete='CASCADE'))
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinic.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visits = db.relationship('Visit', lazy='dynamic')
 

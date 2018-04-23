@@ -8,7 +8,7 @@ function initMap() {
     if (status == 'OK') {
       latlang = results[0].geometry.location;
       var mapOptions = {
-        zoom: 15,
+        zoom: 16,
         center: latlang
       };
       map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -16,6 +16,7 @@ function initMap() {
           map: map,
           position: latlang
       });
+      google.maps.event.trigger(map, 'resize');
     } else {
       document.getElementById('map').innerHTML = "К сожалению, такого адреса не существует на карте";
     }
