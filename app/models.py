@@ -112,7 +112,7 @@ class Person(db.Model):
     comments = db.Column(db.String(250), index=True)
     picture_filename = db.Column(db.String(250), nullable=True)
     picture_url = db.Column(db.String(100), nullable=True)
-    phone = db.Column(db.String(20), index=True, unique=True)
+    phone = db.Column(db.String(50), index=True, unique=True)
     email = db.Column(db.String(180), index=True, unique=True)
     department = db.Column(db.String(100), index=True)
     last_visit = db.Column(db.DateTime)
