@@ -24,7 +24,7 @@ choices = [('Урологическое','Урологическое'),
             ('РАО Нейрохирургии', 'РАО Нейрохирургии'),
             ('АРО', 'АРО'),
             ('Диализ/Гемодиализ', 'Диализ/Гемодиализ'),
-            ('Гематология', 'Гематология')б
+            ('Гематология', 'Гематология'),
             ('Другое', 'Другое')]
 
 
@@ -41,6 +41,7 @@ class NewClinic(FlaskForm):
         DataRequired(), Length(min=1, max=250)])
     inn = StringField('Введите ИНН клиники', validators=[
         DataRequired(), Length(min=10, max=10, message='Вы ввели неккоректный ИНН')])
+    comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
     submit = SubmitField('Добавить')
 
     def validate_clinic_name(self, clinic_name):
@@ -61,6 +62,7 @@ class EditClinic(FlaskForm):
         DataRequired(), Length(min=1, max=250)])
     inn = StringField('Введите ИНН клиники', validators=[
         DataRequired(), Length(min=10, max=10, message='Вы ввели неккоректный ИНН')])
+    comments = TextAreaField('Примечания', validators=[Length(min=1, max=250)])
     submit = SubmitField('Сохранить')
 
     def __init__(self, original_clinic_name, original_clinic_inn, *args, **kwargs):

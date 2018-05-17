@@ -67,7 +67,8 @@
 					<th>Наименование</th>
 					<th>Адрес</th>
 					<th>ИНН</th>
-					<th></th>
+					<th>Примечания</th>
+          <th></th>
           <th></th>
 				</tr>
 			</thead>
@@ -78,12 +79,14 @@
 					<th></th>
 					<th></th>
           <th></th>
+          <th></th>
 				</tr>
 					{% for i in clinics %}
 				<tr>
 					<td><a href='{{url_for('clients.showPersons', region_name=region.name, clinic_id = i.id) }}'>{{i.clinic_name}}</a></td>
 					<td>{{i.address}}</td>
 					<td>{{i.inn}}</td>
+          <td>{{i.comments}}</td>
 					<td>  <a class="btn btn-default glyphicon glyphicon-pencil" href='{{url_for('clients.editClinic', region_name=region.name, clinic_id = i.id) }}'></a>
           </td>
 					<td>

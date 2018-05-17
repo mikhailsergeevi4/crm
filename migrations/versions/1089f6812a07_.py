@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 2ea50ba912e5
+Revision ID: 1089f6812a07
 Revises: 
-Create Date: 2018-04-19 13:06:28.441794
+Create Date: 2018-05-17 14:19:24.481844
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2ea50ba912e5'
+revision = '1089f6812a07'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,6 +51,16 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_contract_customer'), ['customer'], unique=False)
         batch_op.create_index(batch_op.f('ix_contract_ground'), ['ground'], unique=False)
         batch_op.create_index(batch_op.f('ix_contract_notes'), ['notes'], unique=False)
+
+    op.create_table('do_not_forget',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('notes', sa.String(length=250), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('do_not_forget', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_do_not_forget_notes'), ['notes'], unique=False)
 
     op.create_table('followers',
     sa.Column('follower_id', sa.Integer(), nullable=True),
@@ -105,6 +115,7 @@ def upgrade():
     sa.Column('address', sa.String(length=250), nullable=True),
     sa.Column('inn', sa.String(length=15), nullable=False),
     sa.Column('region_name', sa.String(length=180), nullable=True),
+    sa.Column('comments', sa.String(length=250), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['region_name'], ['region.name'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
@@ -114,6 +125,7 @@ def upgrade():
     with op.batch_alter_table('clinic', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_clinic_address'), ['address'], unique=False)
         batch_op.create_index(batch_op.f('ix_clinic_clinic_name'), ['clinic_name'], unique=True)
+        batch_op.create_index(batch_op.f('ix_clinic_comments'), ['comments'], unique=False)
 
     op.create_table('person',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -121,7 +133,7 @@ def upgrade():
     sa.Column('comments', sa.String(length=250), nullable=True),
     sa.Column('picture_filename', sa.String(length=250), nullable=True),
     sa.Column('picture_url', sa.String(length=100), nullable=True),
-    sa.Column('phone', sa.String(length=20), nullable=True),
+    sa.Column('phone', sa.String(length=50), nullable=True),
     sa.Column('email', sa.String(length=180), nullable=True),
     sa.Column('department', sa.String(length=100), nullable=True),
     sa.Column('last_visit', sa.DateTime(), nullable=True),
@@ -131,7 +143,7 @@ def upgrade():
     sa.Column('region_name', sa.String(length=180), nullable=True),
     sa.Column('clinic_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['clinic_id'], ['clinic.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['clinic_id'], ['clinic.id'], ),
     sa.ForeignKeyConstraint(['region_name'], ['region.name'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -175,6 +187,7 @@ def downgrade():
 
     op.drop_table('person')
     with op.batch_alter_table('clinic', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_clinic_comments'))
         batch_op.drop_index(batch_op.f('ix_clinic_clinic_name'))
         batch_op.drop_index(batch_op.f('ix_clinic_address'))
 
@@ -195,6 +208,10 @@ def downgrade():
 
     op.drop_table('post')
     op.drop_table('followers')
+    with op.batch_alter_table('do_not_forget', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_do_not_forget_notes'))
+
+    op.drop_table('do_not_forget')
     with op.batch_alter_table('contract', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_contract_notes'))
         batch_op.drop_index(batch_op.f('ix_contract_ground'))

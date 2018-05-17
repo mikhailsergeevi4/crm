@@ -46,7 +46,26 @@
   </div>
 </div>
 
+<!-- Modal Archive -->
+<div id="win" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Подтверждение перемещения в архив</h4>
+      </div>
 
+      <div class="modal-body">
+        <p>Вы уверены что хотите переместить контракт в архив?</p>
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+              <button class="btn btn-success btn-ok">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <div class="row">
       <div class="col-xs-6 col-md-2">
@@ -69,6 +88,7 @@
           <th>Заказчик</th>
           <th></th>
           <th></th>
+          <th></th>
 				</tr>
 			</thead>
 			<tbody id="myTable">
@@ -77,6 +97,7 @@
 					<th></th>
 					<th></th>
 					<th></th>
+          <th></th>
           <th></th>
           <th></th>
           <th></th>
@@ -101,10 +122,10 @@
 					<td>
             <a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{url_for('contract.deleteContract', contract_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
             </a>
-
-        </td>
-
-
+          </td>
+          <td><a class="btn btn-success glyphicon glyphicon-ok" href="{{ url_for('contract.archContract', contract_id=i.id) }}">
+              </a>
+          </td>
 				</tr>
 					{% endfor %}
 			</tbody>

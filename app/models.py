@@ -24,6 +24,7 @@ class User(UserMixin, db.Model):
     visits = db.relationship('Visit', backref='author', lazy='dynamic')
     tenders = db.relationship('Tender', backref='author', lazy='dynamic')
     contracts = db.relationship('Contract', backref='author', lazy='dynamic')
+    arch_contracts = db.relationship('ContractArchive', backref='author', lazy='dynamic')
     forget = db.relationship('DoNotForget', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -103,6 +104,7 @@ class Clinic(db.Model):
     address = db.Column(db.String(250), index=True)
     inn = db.Column(db.String(15), nullable=False, unique=True)
     region_name = db.Column(db.String(180), db.ForeignKey('region.name'))
+    comments = db.Column(db.String(250), index=True)
     persons = db.relationship('Person', lazy='dynamic', cascade="all,delete", backref="parent")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -150,6 +152,17 @@ class Contract(db.Model):
     ground = db.Column(db.String(100), index=True)
     customer = db.Column(db.String(100), index=True)
     number = db.Column(db.String(50), unique=True)
+    sign_date = db.Column(db.DateTime)
+    supply = db.Column(db.String(20), unique=True)
+    notes = db.Column(db.String(250), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class ContractArchive(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    company = db.Column(db.String(100), index=True)
+    ground = db.Column(db.String(100), index=True)
+    customer = db.Column(db.String(100), index=True)
+    number = db.Column(db.String(50))
     sign_date = db.Column(db.DateTime)
     supply = db.Column(db.String(20), unique=True)
     notes = db.Column(db.String(250), index=True)

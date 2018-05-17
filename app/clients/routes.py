@@ -28,7 +28,7 @@ def showRegions():
 def showClinics(region_name):
     form = NewClinic()
     if form.validate_on_submit():
-        newClinic = Clinic(clinic_name=form.clinic_name.data, address=form.address.data, inn=form.inn.data, author=current_user, region_name=region_name)
+        newClinic = Clinic(clinic_name=form.clinic_name.data, address=form.address.data, inn=form.inn.data, author=current_user, region_name=region_name, comments=form.comments.data)
         db.session.add(newClinic)
         db.session.commit()
         flash('Новая клиника "{}" добавлена!'.format(form.clinic_name.data))
@@ -63,6 +63,7 @@ def editClinic(clinic_id, region_name):
         clinic.clinic_name = form.clinic_name.data
         clinic.inn = form.inn.data
         clinic.address = form.address.data
+        clinic.comments = form.comments.data
         db.session.commit()
         flash('Изменения сохранены')
         return redirect(url_for('clients.showClinics', region_name=region_name))

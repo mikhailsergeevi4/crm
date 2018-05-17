@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<!-- Modal DELETE -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Подтверждение удаления</h4>
+      </div>
+
+      <div class="modal-body">
+        <p>Вы уверены что хотите удалить контракт?</p>
+
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+              <a class="btn btn-danger btn-ok">Удалить</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <div class="row">
+      <div class="col-xs-6 col-md-2">
+        <h3>Архив</h3>
+      </div>
+      <div class='col-xs-6 col-md-2'>
+        <button class="btn btn-success glyphicon glyphicon-plus add" data-toggle="modal" data-target="#ModalCenter"></button>
+      </div>
+  </div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Номер</th>
+					<th>Дата окончания срока подписания</th>
+					<th>Размер обеспечения</th>
+					<th>Площадка</th>
+          <th>Компания</th>
+          <th>Примечания</th>
+          <th>Заказчик</th>
+          <th></th>
+				</tr>
+			</thead>
+			<tbody id="myTable">
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+
+				</tr>
+					{% for i in archContracts %}
+				<tr>
+					<td><a href='http://zakupki.gov.ru/epz/order/notice/ea44/view/common-info.html?regNumber={{i.number}}'  target="_blank">{{i.number}}</a></td>
+          <td>{{moment(i.sign_date).format('LL')}}</td>
+					<td>{{i.supply}}</td>
+          <td>{{i.ground}}</td>
+          <td>{{i.company}}</td>
+          <td>{{i.notes}}</td>
+          <td>{{i.customer}}</td>
+					<td>
+            <a class="btn btn-danger glyphicon glyphicon-remove" data-href="{{url_for('contract.deleteArchContract', archContract_id=i.id) }}" data-toggle="modal" data-target="#confirm-delete">
+            </a>
+          </td>
+				</tr>
+					{% endfor %}
+			</tbody>
+		</table>
+
+			<a href="{{url_for('contract.showContracts') }}">
+			<p>
+				Назад
+			</p>
+{% endblock %}

@@ -21,12 +21,19 @@
                 </button>
                 <a class="navbar-brand" href="{{ url_for('main.index') }}">УМТК</a>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1 navbarSupportedContent">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('main.explore') }}">Чатик</a></li>
                     <li><a href="{{ url_for('clients.showRegions') }}">Клиенты</a></li>
                     <li><a href="{{ url_for('tender.showTenders') }}">Тендеры</a></li>
-                    <li><a href="{{ url_for('contract.showContracts') }}">Контракты</a></li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Контракты <span class="caret"></span></a>
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('contract.showContracts') }}">Заключение</a></li>
+                        <li><a href="{{ url_for('contract.showArchContracts') }}">Архив</a></li>
+                      </ul>
+                    </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">

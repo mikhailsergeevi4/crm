@@ -14,7 +14,6 @@ from app.main import bp
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    date = datetime.today() + timedelta(20)
     form = AddInfo()
     if form.validate_on_submit():
         info = DoNotForget(notes=form.notes.data, author=current_user)
@@ -22,9 +21,10 @@ def index():
         db.session.commit()
         return redirect(url_for('main.index'))
     infos = DoNotForget.query.filter_by(user_id=current_user.id).all()
-    tenders = Tender.query.filter_by(user_id=current_user.id).order_by(Tender.end_date.asc()).all()
-    persons = Person.query.filter_by(user_id=current_user.id).filter(Person.next_visit < date).order_by(Person.next_visit.asc()).all()
-    return render_template('index.html', title='Home', tenders=tenders, persons=persons, form=form, infos=infos)
+    tenders = Tender.query.filter_by(user_id=current_user.id).filter(Tender.game_date <= datetime.today()).order_by(Tender.end_date.asc()).all()
+    contracts = Contract.query.filter_by(user_id=current_user.id).filter(Contract.sign_date <= datetime.today()).order_by(Contract.sign_date.asc()).all()
+    persons = Person.query.filter_by(user_id=current_user.id).filter(Person.next_visit > datetime.today()).order_by(Person.next_visit.asc()).all()
+    return render_template('index.html', title='Home', tenders=tenders, persons=persons, form=form, infos=infos, contracts=contracts)
 
 @bp.route('/del/<int:info_id>', methods=['GET', 'POST'])
 @login_required
