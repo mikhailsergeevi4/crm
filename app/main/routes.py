@@ -21,8 +21,8 @@ def index():
         db.session.commit()
         return redirect(url_for('main.index'))
     infos = DoNotForget.query.filter_by(user_id=current_user.id).all()
-    tenders = Tender.query.filter_by(user_id=current_user.id).filter(Tender.game_date <= datetime.today()).order_by(Tender.end_date.asc()).all()
-    contracts = Contract.query.filter_by(user_id=current_user.id).filter(Contract.sign_date <= datetime.today()).order_by(Contract.sign_date.asc()).all()
+    tenders = Tender.query.filter_by(user_id=current_user.id).filter(Tender.game_date >= datetime.today()).order_by(Tender.end_date.asc()).all()
+    contracts = Contract.query.filter_by(user_id=current_user.id).filter(Contract.sign_date >= datetime.today()).order_by(Contract.sign_date.asc()).all()
     persons = Person.query.filter_by(user_id=current_user.id).filter(Person.next_visit > datetime.today()).order_by(Person.next_visit.asc()).all()
     return render_template('index.html', title='Home', tenders=tenders, persons=persons, form=form, infos=infos, contracts=contracts)
 
